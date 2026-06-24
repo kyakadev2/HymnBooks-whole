@@ -11,6 +11,8 @@ jobs:
         run: |
           echo "=== ZIP FILES FOUND ==="
           ls -la *.zip
+          echo "=== ZIP CONTENTS ==="
+          unzip -l whole_*.zip | head -50
           echo "=== UNZIPPING ==="
           unzip -q whole_*.zip -d android-project
           echo "=== FOLDER STRUCTURE ==="
@@ -19,10 +21,9 @@ jobs:
       - name: Find or create gradlew
         run: |
           GRADLEW=$(find android-project -name gradlew -type f | head -1)
-          if [ -z "$GRADLEW" ]; then
+          if [ - -z "$GRADLEW" ]; then
             echo "gradlew not found. Generating Gradle Wrapper..."
             cd android-project
-            # Find folder with settings.gradle
             PROJECT_DIR=$(find. -name settings.gradle | head -1 | xargs dirname)
             cd "$PROJECT_DIR"
             gradle wrapper
