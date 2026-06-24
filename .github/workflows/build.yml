@@ -5,34 +5,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Unzip project
-        run: unzip -q whole_hymn_folder.zip -d android-project
+        run: |
+          unzip -q *.zip -d android-project
+          ls -R android-project
+
+      - name: Find gradlew
+        run: |
+          GRADLEW=$(find android-project -name gradlew -type f | head -1)
+          echo "GRADLEW=$GRADLEW" >> $GITHUB_ENV
+          chmod +x $GRADLEW
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Make gradlew executable
-        run: chmod +x android-project/gradlew
-
       - name: Build Debug APK
-        run: cd android-project &&./gradlew assembleDebug
+        run: cd $(dirname $GRADLEW) &&./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: android-project/app/build/outputs/apk/debug/*.apk
-
-      - name: Build AAB
-        run: cd android-project &&./gradlew bundleRelease
-
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release.aab
-          path: android-project/app/build/outputs/bundle/release/*.aab
+          path: '**/build/outputs/apk/debug/*.apk'
