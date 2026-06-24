@@ -22,16 +22,16 @@ jobs:
           if [ -z "$GRADLEW" ]; then
             echo "gradlew not found. Generating Gradle Wrapper..."
             cd android-project
-            # Find project root with settings.gradle or build.gradle
-            PROJECT_DIR=$(find. -name settings.gradle -o -name build.gradle | head -1 | xargs dirname)
-            cd $PROJECT_DIR
+            # Find folder with settings.gradle
+            PROJECT_DIR=$(find. -name settings.gradle | head -1 | xargs dirname)
+            cd "$PROJECT_DIR"
             gradle wrapper
             GRADLEW=$(find. -name gradlew -type f | head -1)
           fi
-          echo "GRADLEW=$GRADLEW"
-          chmod +x $GRADLEW
+          echo "Found gradlew at: $GRADLEW"
+          chmod +x "$GRADLEW"
           echo "GRADLEW=$GRADLEW" >> $GITHUB_ENV
-          echo "PROJECT_DIR=$(dirname $GRADLEW)" >> $GITHUB_ENV
+          echo "PROJECT_DIR=$(dirname "$GRADLEW")" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -40,7 +40,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Debug APK
-        run: cd $PROJECT_DIR &&./gradlew assembleDebug
+        run: cd "$PROJECT_DIR" &&./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
